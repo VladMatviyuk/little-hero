@@ -31,8 +31,8 @@ var ball3 = {
 
 var heroHeight = 20;
 var heroWidth = 20;
-var heroX = 0;
-var heroY = 0;
+var heroX = 20;
+var heroY = 20;
 var heroSpeed = 4;
 
 var rightPressed = false;
@@ -109,27 +109,27 @@ function draw() {
 
 	if (rightPressed) {
 		heroX += heroSpeed;
-		if (heroX + heroWidth > canvas.width) {
-			heroX = canvas.width - heroWidth;
+		if (heroX + heroWidth > canvas.width - 20) {
+			heroX = canvas.width - heroWidth - 20;
 		}
 	}
 	else if (leftPressed) {
 		heroX -= heroSpeed;
-		if (heroX < 0) {
-			heroX = 0;
+		if (heroX < 20) {
+			heroX = 20;
 		}
 	}
 	else if (topPressed) {
 		heroY -= heroSpeed;
-		if (heroY < 0) {
-			heroY = 0;
+		if (heroY < 20) {
+			heroY = 20;
 		}
 
 	}
 	else if (bottomPressed) {
 		heroY += heroSpeed;
-		if (heroY + heroHeight > canvas.height) {
-			heroY = canvas.height - heroHeight;
+		if (heroY + heroHeight > canvas.height - 20) {
+			heroY = canvas.height - heroHeight - 20;
 		}
 	}
 
