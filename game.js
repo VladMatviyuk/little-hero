@@ -5,10 +5,29 @@ var ctx = canvas.getContext("2d");
 var score = 0;
 var ballRadius = 10;
 
-var x = canvas.width / 2;
-var y = canvas.height - 100;
-var dx = 7;
-var dy = -7;
+var ball = {
+	x: canvas.width / 2,
+	y: canvas.height - 100,
+	radius: 10,
+	speedX: 7,
+	speedY: -7,
+}
+
+var ball2 = {
+	x: canvas.width / 2,
+	y: canvas.height - 300,
+	radius: 8,
+	speedX: 4,
+	speedY: -4,
+}
+
+var ball3 = {
+	x: canvas.width / 2,
+	y: canvas.height - 200,
+	radius: 12,
+	speedX: 2,
+	speedY: -2,
+}
 
 var heroHeight = 20;
 var heroWidth = 20;
@@ -52,9 +71,9 @@ function keyUpHandler(e) {
 	}
 }
 
-function drawBall() {
+function drawBall(ball) {
 	ctx.beginPath();
-	ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+	ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
 	ctx.fillStyle = "#0095DD";
 	ctx.fill();
 	ctx.closePath();
@@ -69,22 +88,24 @@ function drawHero() {
 }
 
 function draw() {
+
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	drawBall();
+
+	drawBall(ball);
+	drawBall(ball2);
+	drawBall(ball3);
+
 	drawHero();
 	drawScore();
 
-	if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
-		dx = -dx;
-	}
-	if (y + dy > canvas.height - ballRadius || y + dy < ballRadius) {
-		dy = -dy;
-	}
-	else if (x > heroX && x < heroX + heroWidth + 2 && y > heroY && y < heroY + heroHeight + 2) {
-		alert("GAME OVER! Score: " + score);
-		document.location.reload();
-		clearInterval(interval);
-	}
+	fallForBall(ball);
+	fallForBall(ball2);
+	fallForBall(ball3);
+
+	goBall(ball);
+	goBall(ball2);
+	goBall(ball3);
+
 
 	if (rightPressed) {
 		heroX += heroSpeed;
@@ -112,19 +133,36 @@ function draw() {
 		}
 	}
 
-	x += dx;
-	y += dy;
+
+}
+
+function goBall(ball) {
+	ball.x += ball.speedX;
+	ball.y += ball.speedY;
 }
 
 function scoreUpdate() {
 	score += 10;
-	console.log(score);
 }
 
 function drawScore() {
 	ctx.font = "16px Arial";
 	ctx.fillStyle = "#0095DD";
 	ctx.fillText("Score: " + score, canvas.width - 100, 20);
+}
+
+function fallForBall(ball) {
+	if (ball.x + ball.speedX > canvas.width - ball.radius || ball.x + ball.speedX < ball.radius) {
+		ball.speedX = -ball.speedX;
+	}
+	if (ball.y + ball.speedY > canvas.height - ball.radius || ball.y + ball.speedY < ball.radius) {
+		ball.speedY = -ball.speedY;
+	}
+	else if (ball.x > heroX && ball.x < heroX + heroWidth + 1.7 && ball.y > heroY && ball.y < heroY + heroHeight + 1.7) {
+		alert("GAME OVER! Score: " + score);
+		document.location.reload();
+		clearInterval(interval);
+	}
 }
 
 var intervalScore = setInterval(scoreUpdate, 1000);
