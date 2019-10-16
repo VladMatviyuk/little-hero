@@ -4,40 +4,23 @@ var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 var score = 0;
 var ballRadius = 10;
-console.log(canvas.width);
-console.log(canvas.height);
 
-var ball = {
-	x: canvas.width / 2,
-	y: canvas.height - 100,
-	radius: 10,
-	speedX: 3,
-	speedY: -3,
-}
-
-var ball2 = {
-	x: canvas.width / 2,
-	y: canvas.height - 300,
-	radius: 8,
-	speedX: 4,
-	speedY: -4,
-}
-
-var ball3 = {
-	x: canvas.width / 2,
-	y: canvas.height - 200,
-	radius: 20,
-	speedX: 2,
-	speedY: -2,
-}
-
-var aple = [];
+var balls = [
+	{
+		x: canvas.width / 2,
+		y: canvas.height - 100,
+		radius: 10,
+		speedX: 0.6,
+		speedY: -0.6,
+	}
+];
+var bonus = [];
 
 var heroHeight = 20;
 var heroWidth = 20;
 var heroX = 20;
 var heroY = 20;
-var heroSpeed = 4;
+var heroSpeed = 2;
 
 var rightPressed = false;
 var leftPressed = false;
@@ -92,24 +75,18 @@ function drawHero() {
 }
 
 function draw() {
-
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-	drawBall(ball);
-	// drawBall(ball2);
-	// drawBall(ball3);
-	drawAple();
+	drawBonus();
 	drawHero();
 	drawScore();
 
-	fallForBall(ball);
-	// fallForBall(ball2);
-	// fallForBall(ball3);
-
-	goBall(ball);
-	// goBall(ball2);
-	// goBall(ball3);
-
+	balls.map((ball) => {
+		drawBall(ball);
+		fallForBall(ball);
+		goBall(ball);
+		dieHero(ball);
+	})
 
 	if (rightPressed) {
 		heroX += heroSpeed;
@@ -137,16 +114,16 @@ function draw() {
 		}
 	}
 
-	if (aple.length != 0) {
-		if (aple[0].x > heroX && aple[0].x < heroX + heroWidth + 1.7 && aple[0].y > heroY && aple[0].y < heroY + heroHeight + 1.7) {
+	if (bonus.length != 0) {
+		if (bonus[0].x > heroX && bonus[0].x < heroX + heroWidth + 1.7 && bonus[0].y > heroY && bonus[0].y < heroY + heroHeight + 1.7) {
 			score += 150;
-			aple.splice(0, 1);
-			ball.speedX = Math.abs(ball.speedX) + 1;
-			ball.speedY = Math.abs(ball.speedY) + 1;
+			bonus.splice(0, 1);
+			balls.map((ball) => {
+				ball.speedX = Math.abs(ball.speedX) + 0.3;
+				ball.speedY = Math.abs(ball.speedY) + 0.3;
+			})
 		}
 	}
-
-
 }
 
 function goBall(ball) {
@@ -171,28 +148,22 @@ function fallForBall(ball) {
 	if (ball.y + ball.speedY > canvas.height - ball.radius || ball.y + ball.speedY < ball.radius) {
 		ball.speedY = -ball.speedY;
 	}
-	else if (ball.x > heroX && ball.x < heroX + heroWidth + 1.7 && ball.y > heroY && ball.y < heroY + heroHeight + 1.7) {
-		alert("GAME OVER! Score: " + score);
-		document.location.reload();
-		clearInterval(interval);
-	}
 }
 
-function createAple() {
+function createBonus() {
 	var x = Math.floor((Math.random() * 350) + 30);
 	var y = Math.floor((Math.random() * 200) + 30);
-	console.log(x, y)
 	var radius = 7;
-	aple.splice(0, 1);
-	aple.push({ x: x, y: y, radius: radius });
-	drawAple();
+	bonus.splice(0, 1);
+	bonus.push({ x: x, y: y, radius: radius });
+	drawBonus();
 }
 
-function drawAple() {
-	if (aple.length != 0) {
-		aple.map((ball) => {
+function drawBonus() {
+	if (bonus.length != 0) {
+		bonus.map((bonus) => {
 			ctx.beginPath();
-			ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+			ctx.arc(bonus.x, bonus.y, bonus.radius, 0, Math.PI * 2);
 			ctx.fillStyle = "#37E91E";
 			ctx.fill();
 			ctx.closePath();
@@ -200,6 +171,27 @@ function drawAple() {
 	}
 }
 
+function createBall() {
+	if (balls.length < 3) {
+		var newBall = {
+			x: canvas.width / 2,
+			y: canvas.height - 100,
+			radius: Math.floor((Math.random() * 15) + 6),
+			speedX: 0.3,
+			speedY: -0.3,
+		}
+		balls.push(newBall);
+	}
+}
+
+function dieHero(ball) {
+	if (ball.x > heroX && ball.x < heroX + heroWidth + 1.7 && ball.y > heroY && ball.y < heroY + heroHeight + 1.7) {
+		alert("GAME OVER! Score: " + score);
+		document.location.reload();
+		clearInterval(interval);
+	}
+}
 var intervalScore = setInterval(scoreUpdate, 1000);
-var intervalAple = setInterval(createAple, 5000);
-var interval = setInterval(draw, 10);
+var intervalBous = setInterval(createBonus, 5000);
+var intervalCreateBall = setInterval(createBall, 10000)
+var interval = setInterval(draw, 5);
