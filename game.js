@@ -4,13 +4,15 @@ var canvas = document.getElementById("game");
 var ctx = canvas.getContext("2d");
 var score = 0;
 var ballRadius = 10;
+console.log(canvas.width);
+console.log(canvas.height);
 
 var ball = {
 	x: canvas.width / 2,
 	y: canvas.height - 100,
 	radius: 10,
-	speedX: 7,
-	speedY: -7,
+	speedX: 3,
+	speedY: -3,
 }
 
 var ball2 = {
@@ -24,10 +26,12 @@ var ball2 = {
 var ball3 = {
 	x: canvas.width / 2,
 	y: canvas.height - 200,
-	radius: 12,
+	radius: 20,
 	speedX: 2,
 	speedY: -2,
 }
+
+var aple = [];
 
 var heroHeight = 20;
 var heroWidth = 20;
@@ -92,19 +96,19 @@ function draw() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 	drawBall(ball);
-	drawBall(ball2);
-	drawBall(ball3);
-
+	// drawBall(ball2);
+	// drawBall(ball3);
+	drawAple();
 	drawHero();
 	drawScore();
 
 	fallForBall(ball);
-	fallForBall(ball2);
-	fallForBall(ball3);
+	// fallForBall(ball2);
+	// fallForBall(ball3);
 
 	goBall(ball);
-	goBall(ball2);
-	goBall(ball3);
+	// goBall(ball2);
+	// goBall(ball3);
 
 
 	if (rightPressed) {
@@ -130,6 +134,15 @@ function draw() {
 		heroY += heroSpeed;
 		if (heroY + heroHeight > canvas.height - 20) {
 			heroY = canvas.height - heroHeight - 20;
+		}
+	}
+
+	if (aple.length != 0) {
+		if (aple[0].x > heroX && aple[0].x < heroX + heroWidth + 1.7 && aple[0].y > heroY && aple[0].y < heroY + heroHeight + 1.7) {
+			score += 150;
+			aple.splice(0, 1);
+			ball.speedX = Math.abs(ball.speedX) + 1;
+			ball.speedY = Math.abs(ball.speedY) + 1;
 		}
 	}
 
@@ -165,5 +178,28 @@ function fallForBall(ball) {
 	}
 }
 
+function createAple() {
+	var x = Math.floor((Math.random() * 350) + 30);
+	var y = Math.floor((Math.random() * 200) + 30);
+	console.log(x, y)
+	var radius = 7;
+	aple.splice(0, 1);
+	aple.push({ x: x, y: y, radius: radius });
+	drawAple();
+}
+
+function drawAple() {
+	if (aple.length != 0) {
+		aple.map((ball) => {
+			ctx.beginPath();
+			ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+			ctx.fillStyle = "#37E91E";
+			ctx.fill();
+			ctx.closePath();
+		})
+	}
+}
+
 var intervalScore = setInterval(scoreUpdate, 1000);
+var intervalAple = setInterval(createAple, 5000);
 var interval = setInterval(draw, 10);
