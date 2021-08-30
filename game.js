@@ -1,129 +1,84 @@
-console.log('game start');
+const CANVAS = document.getElementById("game");
+const CTX = CANVAS.getContext("2d");
 
-var canvas = document.getElementById("game");
-var ctx = canvas.getContext("2d");
-var score = 0;
-var ballRadius = 10;
+const level = prompt('Level: 1, 2, 3?', 1);
 
-var balls = [
+let ballsCount = 0;
+switch (level) {
+	case '1': ballsCount = 3; break;
+	case '2': ballsCount = 6; break;
+	case '3': ballsCount = 9; break;
+	default: ballsCount = 3;
+}
+
+let score = 0;
+let ballRadius = 10;
+
+
+// Parameters hero
+let heroHeight = 20;
+let heroWidth = 20;
+let heroX = 20;
+let heroY = 20;
+let heroSpeed = 2;
+
+let balls = [
 	{
-		x: canvas.width / 2,
-		y: canvas.height - 100,
+		x: CANVAS.width / 2,
+		y: CANVAS.height - 100,
 		radius: 10,
 		speedX: 0.6,
 		speedY: -0.6,
 	}
 ];
-var bonus = [];
 
-var heroHeight = 20;
-var heroWidth = 20;
-var heroX = 20;
-var heroY = 20;
-var heroSpeed = 2;
+let bonus = [];
 
-var rightPressed = false;
-var leftPressed = false;
-var topPressed = false;
-var bottomPressed = false;
+// Key handler parameters
+let rightPressed = false;
+let leftPressed = false;
+let topPressed = false;
+let bottomPressed = false;
 
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 
 function keyDownHandler(e) {
-	if (e.key == "Right" || e.key == "ArrowRight") {
-		rightPressed = true;
-	}
-	else if (e.key == "Left" || e.key == "ArrowLeft") {
-		leftPressed = true;
-	} else if (e.key == "Up" || e.key == "ArrowUp") {
-		topPressed = true;
-	} else if (e.key == "Down" || e.key == "ArrowDown") {
-		bottomPressed = true;
-	}
+	if (e.key == "d" || e.key == "ArrowRight")
+		rightPressed = true
+	else if (e.key == "a" || e.key == "ArrowLeft")
+		leftPressed = true
+	else if (e.key == "w" || e.key == "ArrowUp")
+		topPressed = true
+	else if (e.key == "s" || e.key == "ArrowDown")
+		bottomPressed = true
 }
 
 function keyUpHandler(e) {
-	if (e.key == "Right" || e.key == "ArrowRight") {
+	if (e.key == "d" || e.key == "ArrowRight")
 		rightPressed = false;
-	}
-	else if (e.key == "Left" || e.key == "ArrowLeft") {
+	else if (e.key == "a" || e.key == "ArrowLeft")
 		leftPressed = false;
-	}
-	else if (e.key == "Up" || e.key == "ArrowUp") {
+	else if (e.key == "w" || e.key == "ArrowUp")
 		topPressed = false;
-	}
-	else if (e.key == "Down" || e.key == "ArrowDown") {
+	else if (e.key == "s" || e.key == "ArrowDown")
 		bottomPressed = false;
-	}
 }
 
 function drawBall(ball) {
-	ctx.beginPath();
-	ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-	ctx.fillStyle = "#0095DD";
-	ctx.fill();
-	ctx.closePath();
+	CTX.beginPath();
+	CTX.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+	CTX.fillStyle = "#0095DD";
+	CTX.fill();
+	CTX.closePath();
 }
 
 function drawHero() {
-	ctx.beginPath();
-	ctx.rect(heroX, heroY, heroWidth, heroHeight);
-	ctx.fillStyle = "#0095DD";
-	ctx.fill();
-	ctx.closePath();
-}
-
-function draw() {
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-	drawBonus();
-	drawHero();
-	drawScore();
-
-	balls.map((ball) => {
-		drawBall(ball);
-		fallForBall(ball);
-		goBall(ball);
-		dieHero(ball);
-	})
-
-	if (rightPressed) {
-		heroX += heroSpeed;
-		if (heroX + heroWidth > canvas.width - 20) {
-			heroX = canvas.width - heroWidth - 20;
-		}
-	}
-	else if (leftPressed) {
-		heroX -= heroSpeed;
-		if (heroX < 20) {
-			heroX = 20;
-		}
-	}
-	else if (topPressed) {
-		heroY -= heroSpeed;
-		if (heroY < 20) {
-			heroY = 20;
-		}
-
-	}
-	else if (bottomPressed) {
-		heroY += heroSpeed;
-		if (heroY + heroHeight > canvas.height - 20) {
-			heroY = canvas.height - heroHeight - 20;
-		}
-	}
-
-	if (bonus.length != 0) {
-		if (bonus[0].x > heroX && bonus[0].x < heroX + heroWidth + 1.7 && bonus[0].y > heroY && bonus[0].y < heroY + heroHeight + 1.7) {
-			score += 150;
-			bonus.splice(0, 1);
-			balls.map((ball) => {
-				ball.speedX = Math.abs(ball.speedX) + 0.3;
-				ball.speedY = Math.abs(ball.speedY) + 0.3;
-			})
-		}
-	}
+	CTX.beginPath();
+	CTX.rect(heroX, heroY, heroWidth, heroHeight);
+	CTX.fillStyle = "#0095DD";
+	CTX.fill();
+	CTX.closePath();
 }
 
 function goBall(ball) {
@@ -136,17 +91,32 @@ function scoreUpdate() {
 }
 
 function drawScore() {
-	ctx.font = "16px Arial";
-	ctx.fillStyle = "#0095DD";
-	ctx.fillText("Score: " + score, canvas.width - 100, 20);
+	CTX.font = "16px Arial";
+	CTX.fillStyle = "#0095DD";
+	CTX.fillText("Score: " + score, CANVAS.width - 100, 20);
 }
 
-function fallForBall(ball) {
-	if (ball.x + ball.speedX > canvas.width - ball.radius || ball.x + ball.speedX < ball.radius) {
-		ball.speedX = -ball.speedX;
-	}
-	if (ball.y + ball.speedY > canvas.height - ball.radius || ball.y + ball.speedY < ball.radius) {
-		ball.speedY = -ball.speedY;
+function wallForBall(ball) {
+	if (ball.x + ball.speedX > CANVAS.width - ball.radius
+		|| ball.x + ball.speedX < ball.radius) ball.speedX = -ball.speedX;
+
+	if (ball.y + ball.speedY > CANVAS.height - ball.radius
+		|| ball.y + ball.speedY < ball.radius) ball.speedY = -ball.speedY;
+}
+
+function wallChecked() {
+	if (rightPressed) {
+		heroX += heroSpeed;
+		if (heroX + heroWidth > CANVAS.width - 20) heroX = CANVAS.width - heroWidth - 20;
+	} else if (leftPressed) {
+		heroX -= heroSpeed;
+		if (heroX < 20) heroX = 20;
+	} else if (topPressed) {
+		heroY -= heroSpeed;
+		if (heroY < 20) heroY = 20;
+	} else if (bottomPressed) {
+		heroY += heroSpeed;
+		if (heroY + heroHeight > CANVAS.height - 20) heroY = CANVAS.height - heroHeight - 20;
 	}
 }
 
@@ -162,25 +132,42 @@ function createBonus() {
 function drawBonus() {
 	if (bonus.length != 0) {
 		bonus.map((bonus) => {
-			ctx.beginPath();
-			ctx.arc(bonus.x, bonus.y, bonus.radius, 0, Math.PI * 2);
-			ctx.fillStyle = "#37E91E";
-			ctx.fill();
-			ctx.closePath();
+			CTX.beginPath();
+			CTX.arc(bonus.x, bonus.y, bonus.radius, 0, Math.PI * 2);
+			CTX.fillStyle = "#37E91E";
+			CTX.fill();
+			CTX.closePath();
 		})
 	}
 }
 
 function createBall() {
-	if (balls.length < 3) {
+	if (balls.length < ballsCount) {
 		var newBall = {
-			x: canvas.width / 2,
-			y: canvas.height - 100,
+			x: CANVAS.width / 2,
+			y: CANVAS.height - 100,
 			radius: Math.floor((Math.random() * 15) + 6),
 			speedX: 0.3,
 			speedY: -0.3,
 		}
 		balls.push(newBall);
+	}
+}
+
+function collisionHeroAndBonus() {
+	if (bonus.length != 0) {
+		if (bonus[0].x > heroX
+			&& bonus[0].x < heroX + heroWidth + 1.7
+			&& bonus[0].y > heroY
+			&& bonus[0].y < heroY + heroHeight + 1.7) {
+			score += 150;
+			bonus.splice(0, 1);
+
+			balls.map((ball) => {
+				ball.speedX = Math.abs(ball.speedX) + 0.3;
+				ball.speedY = Math.abs(ball.speedY) + 0.3;
+			})
+		}
 	}
 }
 
@@ -191,7 +178,26 @@ function dieHero(ball) {
 		clearInterval(interval);
 	}
 }
+
+function draw() {
+	CTX.clearRect(0, 0, CANVAS.width, CANVAS.height);
+
+	drawBonus();
+	drawHero();
+	drawScore();
+
+	balls.map((ball) => {
+		drawBall(ball);
+		wallForBall(ball);
+		goBall(ball);
+		dieHero(ball);
+	})
+
+	wallChecked();
+	collisionHeroAndBonus()
+}
+
 var intervalScore = setInterval(scoreUpdate, 1000);
 var intervalBous = setInterval(createBonus, 5000);
-var intervalCreateBall = setInterval(createBall, 10000)
+var intervalCreateBall = setInterval(createBall, 5000)
 var interval = setInterval(draw, 5);
